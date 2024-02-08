@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NFT Access Control</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3/dist/web3.min.js"></script>
+</head>
+<body>
+    <button id="connectWallet">Connect Wallet</button>
+    <script>
+        const connectWalletButton = document.getElementById('connectWallet');
+        let web3;
+
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3 = new Web3(window.ethereum);
+                    checkNFTOwnership();
+                } catch (error) {
+                    console.error('User denied account access');
+                }
+            } else {
+                console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+            }
+        }
+
+        async function checkNFTOwnership() {
+            const contractAddress = 'YOUR_CONTRACT_ADDRESS_HERE';
+            const contractABI = [/* Contract ABI here */];
+            const contract = new web3.eth.Contract(contractABI, contractAddress);
+            const accounts = await web3.eth.getAccounts();
+            const userAddress = accounts[0];
+
+            contract.methods.verifyOwnership(userAddress).call()
+                .then((isOwner) => {
+                    if (isOwner) {
+                        alert('Access Granted');
+                    } else {
+                        window.location.href = 'URL_TO_REDIRECT_FOR_NFT_PURCHASE';
+                    }
+                })
+                .catch((err) => {
+                    console.error(err);
+                });
+        }
+
+        connectWalletButton.addEventListener('click', connectWallet);
+    </script>
+</body>
+</html>
